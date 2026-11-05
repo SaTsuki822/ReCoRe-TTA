@@ -1,0 +1,9 @@
+scale: 4
+in_chans: 1
+embed_dim: 180
+depths: [8, 8, 8, 8, 8, 8]
+d_state: 16
+mlp_ratio: 2
+img_size: 64
+upsampler: pixelshuffle
+resi_connection: 1conv

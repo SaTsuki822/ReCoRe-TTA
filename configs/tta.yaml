@@ -1,0 +1,15 @@
+# ReCoRe TTA 超参（对齐补充材料 Table 6）
+iterations: 10        # T
+lr: 1.0e-4            # eta
+omega_1: 0.0
+kappa: 0.1            # 动态权重更新率
+lambda_up: 1.0
+lambda_anc: 0.1
+region_size: 8        # R
+tau_A: 0.75
+T_A: 0.10
+beta: 2.0             # 边界抑制
+delta_A: 0.05
+eps_A: 0.10
+tunable_keywords: [out_proj]   # 可微调线性层集合（SS2D.out_proj）
+student_view: harder           # 学生亲和性在 harder view 上计算

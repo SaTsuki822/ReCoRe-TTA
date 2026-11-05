@@ -1,0 +1,12 @@
+torch==2.1.0
+torchvision==0.16.0
+mamba-ssm==1.0.1
+causal-conv1d==1.0.0
+numpy
+scipy
+opencv-python
+imageio
+tqdm
+pandas
+# 可选：无参考指标 MANIQA（通过 pyiqa 调用，未安装时 MANIQA 会给出明确报错）
+pyiqa

@@ -1,0 +1,10 @@
+# VanillaMamba backbone 超参（对齐上游 Mamba-SR 工程 options/train/ 下的 x2 训练配置）
+scale: 2
+in_chans: 1          # ReCoRe 单通道红外；预训练权重为 3 通道时 load_backbone_weights 自动通道平均
+embed_dim: 180
+depths: [8, 8, 8, 8, 8, 8]   # 6 组 x 8 块 = 48 个 VSSBlock
+d_state: 16
+mlp_ratio: 2
+img_size: 64
+upsampler: pixelshuffle
+resi_connection: 1conv
