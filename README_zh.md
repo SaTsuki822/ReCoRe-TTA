@@ -46,10 +46,32 @@ python -m src.backbone.train --dataroot <M3FD目录> --scale 4 --save_dir checkp
 
 ```shell
 cd ReCoRe-main
-python -m src.estimator.train --img_dir <M3FD路径> --save_dir checkpoints/estimator --calibrate
+python -m src.estimator.train --img_dir <M3FD红外图目录> \
+    --save_dir checkpoints/estimator --length 20000 --epochs 30 --calibrate
 # 无数据冒烟（随机平滑合成场景）：
-python -m src.estimator.train --length 200 --epochs 2 --batch_size 4
+python -m src.estimator.train --synthetic --length 8 --val_length 4 \
+    --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
+
+`--img_dir` 应直接包含红外源图，支持 `.png/.jpg/.jpeg/.bmp`（扩展名不区分大小写），不递归读取子目录。
+目录不存在或为空会报错；随机合成图只用于显式指定 `--synthetic` 的冒烟训练。
+
+默认先按源图划分，留出 10% 用于验证；启用 `--calibrate` 时再留出 10% 用于独立校准，余下 80% 用于训练。
+未启用校准时训练/验证比例为 90%/10%。`--val_fraction`、`--cal_fraction` 可调整留出比例。
+自动划分只保证源文件互斥；如包含同一场景的近重复图，应先按场景分组，再传入独立目录：
+
+```shell
+python -m src.estimator.train --img_dir <train目录> --val_dir <val目录> \
+    --cal_dir <cal目录> --calibrate --length 20000 --epochs 30
+```
+
+独立目录之间有同一源文件（包括软链接、硬链接）会报错。校准集不参与梯度训练或最佳权重选择，测试集应另行保留。
+`--length` 为每轮随机采样的训练图对数，与源图数量无关；训练图对每轮更新，验证/校准图对的源图、裁剪和退化保持固定。
+`--val_length`、`--cal_length` 默认为各 1000 对；固定图对按源图轮转，建议至少覆盖各自全部源图。
+
+输出包括 `data_split.json`（源图划分、随机种子和运行参数）、`metrics.jsonl`（每轮训练/验证 loss、逐退化 F1 和激活参数 MAE）、
+`estimator_best.pt`（验证 loss 最低的权重，尚未校准）和 `estimator_final.pt`（同一最佳权重及独立校准得到的温度）。
+参数 MAE 在归一化到 `[0,1]` 的空间计算，仅统计激活参数；正式训练应结合分类、参数误差和下游 TTA 效果判断收敛。
 
 ## 测试时自适应
 
@@ -94,6 +116,7 @@ python main_tta.py --scale 2 --lr_dir <LR目录> --backbone_ckpt checkpoints/Van
 cd ReCoRe-main
 python tests/test_degradation.py
 python tests/test_estimator.py
+python tests/test_estimator_training.py
 python tests/test_backbone.py
 python tests/test_affinity.py
 ```

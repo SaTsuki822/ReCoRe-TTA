@@ -19,6 +19,11 @@ import torch.nn.functional as F
 
 # ---- internal helpers ----
 
+def _generator(seed, device):
+    """Use the global RNG unless reproducibility was explicitly requested."""
+    return None if seed is None else torch.Generator(device=device).manual_seed(seed)
+
+
 def _as_tensor(v, dtype, device):
     """Cast a scalar/tensor to the target dtype/device."""
     if isinstance(v, torch.Tensor):
@@ -40,9 +45,7 @@ def _gaussian_kernel(sigma_x, sigma_y, theta, ks):
 
 def _smooth_field_2d(h, w, corr_len, seed, dtype, device):
     """Zero-mean smooth 2D random field normalized to [-1,1]; corr_len controls roughness."""
-    gen = torch.Generator(device=device)
-    if seed is not None:
-        gen.manual_seed(seed)
+    gen = _generator(seed, device)
     gh = max(1, int(math.ceil(h / max(float(corr_len), 1.0))))
     gw = max(1, int(math.ceil(w / max(float(corr_len), 1.0))))
     z = torch.randn(1, 1, gh, gw, generator=gen, dtype=dtype, device=device)
@@ -53,9 +56,7 @@ def _smooth_field_2d(h, w, corr_len, seed, dtype, device):
 
 def _smooth_field_1d(n, corr_len, seed, dtype, device):
     """Zero-mean smooth 1D random field normalized to [-1,1]."""
-    gen = torch.Generator(device=device)
-    if seed is not None:
-        gen.manual_seed(seed)
+    gen = _generator(seed, device)
     gn = max(1, int(math.ceil(n / max(float(corr_len), 1.0))))
     z = torch.randn(1, 1, gn, generator=gen, dtype=dtype, device=device)
     field = F.interpolate(z, size=(n,), mode="linear", align_corners=False)
@@ -100,9 +101,7 @@ def apply_offset_nonuniformity(x, a_o, l_o, seed=None):
 def apply_readout_noise(x, sigma_r, seed=None):
     """Readout noise: zero-mean, signal-independent Gaussian (reparameterized)."""
     s = _as_tensor(sigma_r, x.dtype, x.device)
-    gen = torch.Generator(device=x.device)
-    if seed is not None:
-        gen.manual_seed(seed)
+    gen = _generator(seed, x.device)
     noise = torch.randn(x.size(), generator=gen, dtype=x.dtype, device=x.device) * s
     return x + noise
 
@@ -110,9 +109,7 @@ def apply_readout_noise(x, sigma_r, seed=None):
 def apply_signal_dependent_noise(x, sigma_s, seed=None):
     """Signal-dependent noise: variance proportional to local intensity."""
     s = _as_tensor(sigma_s, x.dtype, x.device)
-    gen = torch.Generator(device=x.device)
-    if seed is not None:
-        gen.manual_seed(seed)
+    gen = _generator(seed, x.device)
     std = s * torch.sqrt(x.clamp(min=0.0))
     return x + torch.randn(x.size(), generator=gen, dtype=x.dtype, device=x.device) * std
 
@@ -192,9 +189,7 @@ def apply_saturation_agc(x, p_clip, gamma):
 def apply_bad_pixels(x, p_bad, v_bad, seed=None):
     """Fixed bad pixels: replace random positions with v_bad in {0,1}."""
     p = _as_tensor(p_bad, x.dtype, x.device)
-    gen = torch.Generator(device=x.device)
-    if seed is not None:
-        gen.manual_seed(seed)
+    gen = _generator(seed, x.device)
     mask = (torch.rand(x.shape, generator=gen, device=x.device) < p).to(x.dtype)
     v = float(int(round(float(v_bad))))
     return x * (1.0 - mask) + v * mask

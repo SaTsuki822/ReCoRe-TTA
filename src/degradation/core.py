@@ -33,8 +33,8 @@ def sample_degradation(rng: Optional[torch.Generator] = None, device=None,
     raw:    (18,) raw parameters (inactive classes zeroed)
     norm:   (18,) parameters normalized to [0,1] (regression target)
     """
-    if rng is None:
-        rng = torch.Generator(device=device)
+    # None uses PyTorch's advancing global RNG. Constructing a generator here
+    # would restart from the same default seed for every sample.
     probs = torch.tensor([d.prob for d in P.DEGRADATIONS], dtype=dtype, device=device)
     active = torch.bernoulli(probs, generator=rng)
     if active.sum().item() == 0:

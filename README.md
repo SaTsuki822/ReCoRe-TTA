@@ -46,10 +46,28 @@ python -m src.backbone.train --dataroot <M3FD_dir> --scale 4 --save_dir checkpoi
 
 ```shell
 cd ReCoRe-main
-python -m src.estimator.train --img_dir <M3FD_dir> --save_dir checkpoints/estimator --calibrate
+python -m src.estimator.train --img_dir <M3FD_IR_dir> \
+    --save_dir checkpoints/estimator --length 20000 --epochs 30 --calibrate
 # smoke test without data (random smooth synthetic scenes):
-python -m src.estimator.train --length 200 --epochs 2 --batch_size 4
+python -m src.estimator.train --synthetic --length 8 --val_length 4 \
+    --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
+
+The image directory must directly contain IR images (`.png/.jpg/.jpeg/.bmp`, case-insensitive).
+Missing or empty directories raise an error. Synthetic scenes require the explicit `--synthetic` flag.
+By default, source images are split before patch generation: 10% validation, another 10% calibration
+when `--calibrate` is enabled, and the remainder training. Without calibration the split is 90%/10%.
+Use `--val_fraction` / `--cal_fraction` to change the reserved fractions. To keep related scenes in
+the same split, prepare separate directories and pass `--val_dir` and `--cal_dir` alongside `--img_dir`.
+Shared source files across splits, including symlinks and hardlinks, are rejected. Keep any test set separate.
+
+`--length` is the number of training pairs sampled per epoch, regardless of the source image count.
+Training pairs refresh each epoch; held-out source selection, crops, labels and noise stay fixed.
+`--val_length` and `--cal_length` default to 1000 pairs each and should cover their source images.
+The run writes `data_split.json`, per-epoch `metrics.jsonl` (losses, per-class F1 and active-parameter MAE),
+`estimator_best.pt` (lowest validation loss, uncalibrated), and `estimator_final.pt`
+(the same best weights with a temperature fitted only on the calibration split).
+Parameter MAE is measured in normalized [0,1] space over active parameters.
 
 ## Test-Time Adaptation
 
@@ -94,6 +112,7 @@ python main_tta.py --scale 2 --lr_dir <LR_dir> --backbone_ckpt checkpoints/Vanil
 cd ReCoRe-main
 python tests/test_degradation.py
 python tests/test_estimator.py
+python tests/test_estimator_training.py
 python tests/test_backbone.py
 python tests/test_affinity.py
 ```

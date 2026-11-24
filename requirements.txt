@@ -1,7 +1,7 @@
-torch==2.1.0
-torchvision==0.16.0
-mamba-ssm==1.0.1
-causal-conv1d==1.0.0
+# torch==2.1.0
+# torchvision==0.16.0
+# mamba-ssm==1.0.1
+# causal-conv1d==1.0.0
 numpy
 scipy
 opencv-python
