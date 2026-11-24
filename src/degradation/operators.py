@@ -107,10 +107,15 @@ def apply_readout_noise(x, sigma_r, seed=None):
 
 
 def apply_signal_dependent_noise(x, sigma_s, seed=None):
-    """Signal-dependent noise: variance proportional to local intensity."""
+    """Signal-dependent noise with a finite derivative at zero intensity.
+
+    A tiny variance floor avoids sqrt(0)'s infinite derivative contaminating
+    the learnable blur/gain operators upstream in the synthesis loss.
+    """
     s = _as_tensor(sigma_s, x.dtype, x.device)
     gen = _generator(seed, x.device)
-    std = s * torch.sqrt(x.clamp(min=0.0))
+    variance_floor = max(1e-6, torch.finfo(x.dtype).tiny)
+    std = s * torch.sqrt(x.clamp(min=variance_floor))
     return x + torch.randn(x.size(), generator=gen, dtype=x.dtype, device=x.device) * std
 
 

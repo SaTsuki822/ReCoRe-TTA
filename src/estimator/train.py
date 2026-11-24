@@ -6,6 +6,7 @@
 
 import argparse
 import json
+import math
 import os
 import random
 
@@ -17,6 +18,28 @@ from .losses import compute_losses
 from .data import DegradationPairDataset, discover_images
 from .calibrate import temperature_scale
 from ..degradation.params import DEGRADATIONS, PARAM_SLICES, activation_mask
+
+
+def _require_finite(tensors, context):
+    bad = [name for name, value in tensors.items() if not torch.isfinite(value).all()]
+    if bad:
+        raise RuntimeError("Non-finite %s at %s" % (", ".join(bad), context))
+
+
+def _backward_step(loss, model, optimizer, max_grad_norm, context):
+    """Reject invalid updates before they can corrupt model/Adam state."""
+    _require_finite({"loss": loss}, context)
+    loss.backward()
+    try:
+        grad_norm = torch.nn.utils.clip_grad_norm_(
+            model.parameters(), max_grad_norm, error_if_nonfinite=True)
+    except RuntimeError as exc:
+        bad = [name for name, param in model.named_parameters()
+               if param.grad is not None and not torch.isfinite(param.grad).all()]
+        raise RuntimeError("Non-finite gradients at %s; optimizer step not applied. Parameters: %s" %
+                           (context, ", ".join(bad[:5]) or "total gradient norm")) from exc
+    optimizer.step()
+    return grad_norm
 
 
 def build_datasets(args):
@@ -87,9 +110,13 @@ def evaluate(model, loader, device):
     count = 0
     for batch_idx, batch in enumerate(loader):
         x, xp, active, norm = (t.to(device) for t in batch)
+        context = "validation batch %d" % (batch_idx + 1)
+        _require_finite({"x": x, "x_prime": xp, "active": active, "norm": norm}, context)
         logits, phi, confidence = model(x, xp)
+        _require_finite({"logits": logits, "phi": phi, "confidence": confidence}, context)
         loss, parts = compute_losses(logits, phi, confidence, x, xp, active, norm,
                                      seed=20000 + batch_idx)
+        _require_finite({"loss": loss}, context)
         b = x.shape[0]
         count += b
         totals["loss"] += loss.item() * b
@@ -121,6 +148,8 @@ def evaluate(model, loader, device):
 def train(args):
     if min(args.epochs, args.batch_size, args.save_every) < 1 or args.num_workers < 0:
         raise ValueError("epochs, batch_size, save_every must be positive; num_workers >= 0")
+    if not math.isfinite(args.max_grad_norm) or args.max_grad_norm <= 0:
+        raise ValueError("max_grad_norm must be finite and positive")
     datasets, sources = build_datasets(args)
     device = "cuda" if (torch.cuda.is_available() and not args.cpu) else "cpu"
     torch.manual_seed(args.seed)
@@ -153,13 +182,15 @@ def train(args):
             model.train()
             totals = {k: 0.0 for k in ("loss", "L_cls", "L_reg", "L_syn", "L_conf")}
             count = 0
-            for batch in loader:
+            for batch_idx, batch in enumerate(loader):
                 x, xp, active, norm = (t.to(device) for t in batch)
+                context = "epoch %d batch %d" % (epoch + 1, batch_idx + 1)
+                _require_finite({"x": x, "x_prime": xp, "active": active, "norm": norm}, context)
                 optimizer.zero_grad()
                 logits, phi, confidence = model(x, xp)
+                _require_finite({"logits": logits, "phi": phi, "confidence": confidence}, context)
                 loss, parts = compute_losses(logits, phi, confidence, x, xp, active, norm)
-                loss.backward()
-                optimizer.step()
+                _backward_step(loss, model, optimizer, args.max_grad_norm, context)
                 b = x.shape[0]
                 count += b
                 totals["loss"] += loss.item() * b
@@ -214,6 +245,8 @@ def make_parser():
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--epochs", type=int, default=20)
     parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--max_grad_norm", type=float, default=1.0,
+                        help="clip total gradient norm; non-finite gradients stop before optimizer update")
     parser.add_argument("--descriptor_dim", type=int, default=128)
     parser.add_argument("--hidden_dim", type=int, default=256)
     parser.add_argument("--dropout", type=float, default=0.1)

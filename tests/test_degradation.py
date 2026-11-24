@@ -111,6 +111,19 @@ def test_sample_degradation():
     check(torch.all(raw[~mask.bool()] == 0), "inactive raw == 0")
 
 
+def test_signal_noise_gradient_at_black_pixels():
+    # A zero-valued pixel is valid input; sqrt(0) must not poison upstream gradients.
+    x = torch.tensor([[[[-0.1, 0.0, 1e-8, 0.1]]]], requires_grad=True)
+    sigma = torch.tensor(0.04, requires_grad=True)
+    out = apply_signal_dependent_noise(x, sigma, seed=3)
+    out.sum().backward()
+    check(bool(torch.isfinite(out).all()), "signal noise forward finite at black pixels")
+    check(bool(torch.isfinite(x.grad).all()), "signal noise input gradients finite at black pixels")
+    check(bool(torch.isfinite(sigma.grad)), "signal noise strength gradient finite")
+    check(torch.allclose(out[..., -1], apply_signal_dependent_noise(
+        x.detach(), sigma.detach(), seed=3)[..., -1]), "signal noise remains reproducible")
+
+
 def test_safe_project():
     norm = torch.rand(18)
     safe = safe_project(norm)
@@ -152,7 +165,7 @@ def main():
     global _PASS
     tests = [
         test_params, test_operator_shapes_and_range, test_determinism,
-        test_differentiability, test_sample_degradation, test_safe_project,
+        test_differentiability, test_sample_degradation, test_signal_noise_gradient_at_black_pixels, test_safe_project,
         test_apply_retain_and_discard, test_full_degradation,
     ]
     for t in tests:

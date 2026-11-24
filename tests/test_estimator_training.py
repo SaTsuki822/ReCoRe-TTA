@@ -19,10 +19,10 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 
-from src.degradation import sample_degradation, apply_readout_noise, apply_bad_pixels
-from src.estimator import DegradationEstimator, DegradationPairDataset, temperature_scale
+from src.degradation import sample_degradation, apply_readout_noise, apply_bad_pixels, apply_all
+from src.estimator import DegradationEstimator, DegradationPairDataset, temperature_scale, compute_losses
 from src.estimator.data import discover_images
-from src.estimator.train import build_datasets, evaluate, make_parser, train
+from src.estimator.train import build_datasets, evaluate, make_parser, train, _backward_step
 
 
 class TrainingTests(unittest.TestCase):
@@ -179,6 +179,43 @@ class TrainingTests(unittest.TestCase):
         self.assertFalse(torch.equal(datasets["train"][0][0], datasets["val"][0][0]))
         self.assertFalse(torch.equal(datasets["train"][0][3], datasets["val"][0][3]))
         self.assertFalse(torch.equal(datasets["val"][0][3], datasets["cal"][0][3]))
+
+
+    def test_black_regions_keep_synthesis_gradients_finite(self):
+        torch.manual_seed(3407)
+        model = DegradationEstimator()
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        x = torch.zeros(2, 1, 32, 32)
+        x[:, :, 12:20, 12:20] = .5
+        active = torch.zeros(2, 9)
+        active[:, 0] = active[:, 4] = 1  # blur -> signal noise, with black borders
+        norm = torch.full((2, 18), .4)
+        xp = torch.cat([apply_all(x[b:b+1], norm[b], active[b], seed=3)
+                        for b in range(2)])
+        for step in range(3):
+            optimizer.zero_grad()
+            logits, phi, conf = model(x, xp)
+            loss, _ = compute_losses(logits, phi, conf, x, xp, active, norm, seed=3)
+            grad_norm = _backward_step(loss, model, optimizer, 1.0, "black region step %d" % step)
+            self.assertTrue(torch.isfinite(grad_norm))
+            self.assertTrue(all(p.grad is None or torch.isfinite(p.grad).all() for p in model.parameters()))
+            self.assertTrue(all(torch.isfinite(p).all() for p in model.parameters()))
+
+    def test_invalid_gradients_do_not_reach_optimizer(self):
+        model = torch.nn.Linear(1, 1, bias=False)
+        torch.nn.init.zeros_(model.weight)
+        optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+        # Forward loss is finite; its backward derivative is infinite.
+        loss = model.weight.sqrt().sum()
+        self.assertTrue(torch.isfinite(loss))
+        with self.assertRaisesRegex(RuntimeError, "Non-finite gradients at test batch"):
+            _backward_step(loss, model, optimizer, 1.0, "test batch")
+        self.assertTrue(torch.equal(model.weight, torch.zeros_like(model.weight)))
+        self.assertEqual(len(optimizer.state), 0)
+        optimizer.zero_grad()
+        with self.assertRaisesRegex(RuntimeError, "Non-finite loss at test loss"):
+            _backward_step(model.weight.sum() * float("nan"), model, optimizer, 1.0, "test loss")
+        self.assertEqual(len(optimizer.state), 0)
 
 
 if __name__ == "__main__":

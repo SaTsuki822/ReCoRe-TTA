@@ -53,6 +53,8 @@ python -m src.estimator.train --synthetic --length 8 --val_length 4 \
     --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
 
+训练默认将总梯度范数裁剪到 1.0（可用 `--max_grad_norm` 调整）。输入、预测、loss 或梯度出现 NaN/Inf 时会报出所在轮次和批次；异常梯度会在优化器更新前停止训练。
+
 ## 测试时自适应
 
 将权重放入 `checkpoints/` 后运行 `main_tta.py`。

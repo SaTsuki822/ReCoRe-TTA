@@ -90,7 +90,9 @@ class PairedSRDataset(Dataset):
         hr = torch.from_numpy(hr).float().unsqueeze(0).unsqueeze(0)  # (1,1,s,s)
         gen = torch.Generator().manual_seed(self.seed + idx)
         lr, _, _, _ = full_degradation(hr, scale=self.scale, rng=gen)
-        return lr, hr
+        # Operators require a temporary batch dimension; Dataset returns CHW,
+        # and DataLoader adds the actual training batch dimension.
+        return lr.squeeze(0), hr.squeeze(0)
 
 
 def train(args):

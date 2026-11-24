@@ -53,6 +53,8 @@ python -m src.estimator.train --synthetic --length 8 --val_length 4 \
     --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
 
+Training clips the total gradient norm to 1.0 (`--max_grad_norm`) and reports the epoch/batch if inputs, predictions, loss, or gradients become non-finite. Invalid gradients stop training before an optimizer update.
+
 ## Test-Time Adaptation
 
 Put the checkpoints under `checkpoints/` and run `main_tta.py`.
