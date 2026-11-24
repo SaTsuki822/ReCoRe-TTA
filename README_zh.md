@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 ## 训练
 
-### 1. 预训练 backbone
+### 1. 预训练源超分辨率模型
 
 ```shell
 cd ReCoRe-main
@@ -52,26 +52,6 @@ python -m src.estimator.train --img_dir <M3FD红外图目录> \
 python -m src.estimator.train --synthetic --length 8 --val_length 4 \
     --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
-
-`--img_dir` 应直接包含红外源图，支持 `.png/.jpg/.jpeg/.bmp`（扩展名不区分大小写），不递归读取子目录。
-目录不存在或为空会报错；随机合成图只用于显式指定 `--synthetic` 的冒烟训练。
-
-默认先按源图划分，留出 10% 用于验证；启用 `--calibrate` 时再留出 10% 用于独立校准，余下 80% 用于训练。
-未启用校准时训练/验证比例为 90%/10%。`--val_fraction`、`--cal_fraction` 可调整留出比例。
-自动划分只保证源文件互斥；如包含同一场景的近重复图，应先按场景分组，再传入独立目录：
-
-```shell
-python -m src.estimator.train --img_dir <train目录> --val_dir <val目录> \
-    --cal_dir <cal目录> --calibrate --length 20000 --epochs 30
-```
-
-独立目录之间有同一源文件（包括软链接、硬链接）会报错。校准集不参与梯度训练或最佳权重选择，测试集应另行保留。
-`--length` 为每轮随机采样的训练图对数，与源图数量无关；训练图对每轮更新，验证/校准图对的源图、裁剪和退化保持固定。
-`--val_length`、`--cal_length` 默认为各 1000 对；固定图对按源图轮转，建议至少覆盖各自全部源图。
-
-输出包括 `data_split.json`（源图划分、随机种子和运行参数）、`metrics.jsonl`（每轮训练/验证 loss、逐退化 F1 和激活参数 MAE）、
-`estimator_best.pt`（验证 loss 最低的权重，尚未校准）和 `estimator_final.pt`（同一最佳权重及独立校准得到的温度）。
-参数 MAE 在归一化到 `[0,1]` 的空间计算，仅统计激活参数；正式训练应结合分类、参数误差和下游 TTA 效果判断收敛。
 
 ## 测试时自适应
 
@@ -110,14 +90,6 @@ python main_tta.py --scale 2 --lr_dir <LR目录> --backbone_ckpt checkpoints/Van
 
 `main_tta.py` 另支持 `--warmup` / `--timeit` 统计单图端到端 GPU 时间。`configs/*.yaml` 为超参参考文档；入口脚本使用与之对齐的 argparse 默认值。
 
-## 单元测试
+## 致谢
 
-```shell
-cd ReCoRe-main
-python tests/test_degradation.py
-python tests/test_estimator.py
-python tests/test_estimator_training.py
-python tests/test_backbone.py
-python tests/test_affinity.py
-```
-
+本代码仓库的实现基于 **SRTTA**、**IRSRMamba** 和 **MambaIR** 的源代码。感谢这些项目的作者公开代码。

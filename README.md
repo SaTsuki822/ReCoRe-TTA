@@ -2,7 +2,7 @@
 
 ![Overall Structure](fig/fig2.png)
 
-Implementation of **ReCoRe**, a test-time adaptation (TTA) framework for infrared image super-resolution (IRSR) under unknown, mixed real-world degradations. 
+Implementation of **ReCoRe**, a test-time adaptation (TTA) framework for infrared image super-resolution (IRSR) under unknown, mixed real-world degradations.
 
 ##### Language: English | [Chinese](README_zh.md)
 
@@ -10,7 +10,7 @@ Implementation of **ReCoRe**, a test-time adaptation (TTA) framework for infrare
 
 ## Requirements
 
-- Python 3.8+, PyTorch 2.1.0, CUDA 11.8 
+- Python 3.8+, PyTorch 2.1.0, CUDA 11.8
 - `mamba-ssm==1.0.1` for the accelerated `SS2D` selective scan
 - `numpy scipy opencv-python imageio tqdm pandas` (see [requirements.txt](requirements.txt))
 - Optional: `pyiqa` for the MANIQA no-reference metric
@@ -24,7 +24,7 @@ pip install -r requirements.txt
 
 ## Dataset Contribution
 
-We contribute **DJIThermalSR**, a new self-collected real-world dataset for infrared SR, captured with the thermal camera (640×512@30fps) of a DJI drone. It contains 5,457 frames extracted from 13 videos collected over six months, spanning 5 weather conditions (day / night / dusk / fog / snow) × 5 scene types (road / street / ground / square / vegetation). 
+We contribute **DJIThermalSR**, a new self-collected real-world dataset for infrared SR, captured with the thermal camera (640×512@30fps) of a DJI drone. It contains 5,457 frames extracted from 13 videos collected over six months, spanning 5 weather conditions (day / night / dusk / fog / snow) × 5 scene types (road / street / ground / square / vegetation).
 
 ![dataExample](fig/fig4.png)
 
@@ -34,7 +34,7 @@ All images are converted to single-channel `[0,1]` on loading. Paired LR–HR im
 
 ## Training
 
-### 1. Pretrain the backbone (source model f_θ0)
+### 1. Pretrain the source model
 
 ```shell
 cd ReCoRe-main
@@ -42,7 +42,7 @@ python -m src.backbone.train --dataroot <M3FD_dir> --scale 2 --save_dir checkpoi
 python -m src.backbone.train --dataroot <M3FD_dir> --scale 4 --save_dir checkpoints/backbone_x4
 ```
 
-### 2. Pretrain the paired relative-degradation estimator E_φ
+### 2. Pretrain the paired relative-degradation estimator
 
 ```shell
 cd ReCoRe-main
@@ -52,22 +52,6 @@ python -m src.estimator.train --img_dir <M3FD_IR_dir> \
 python -m src.estimator.train --synthetic --length 8 --val_length 4 \
     --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
-
-The image directory must directly contain IR images (`.png/.jpg/.jpeg/.bmp`, case-insensitive).
-Missing or empty directories raise an error. Synthetic scenes require the explicit `--synthetic` flag.
-By default, source images are split before patch generation: 10% validation, another 10% calibration
-when `--calibrate` is enabled, and the remainder training. Without calibration the split is 90%/10%.
-Use `--val_fraction` / `--cal_fraction` to change the reserved fractions. To keep related scenes in
-the same split, prepare separate directories and pass `--val_dir` and `--cal_dir` alongside `--img_dir`.
-Shared source files across splits, including symlinks and hardlinks, are rejected. Keep any test set separate.
-
-`--length` is the number of training pairs sampled per epoch, regardless of the source image count.
-Training pairs refresh each epoch; held-out source selection, crops, labels and noise stay fixed.
-`--val_length` and `--cal_length` default to 1000 pairs each and should cover their source images.
-The run writes `data_split.json`, per-epoch `metrics.jsonl` (losses, per-class F1 and active-parameter MAE),
-`estimator_best.pt` (lowest validation loss, uncalibrated), and `estimator_final.pt`
-(the same best weights with a temperature fitted only on the calibration split).
-Parameter MAE is measured in normalized [0,1] space over active parameters.
 
 ## Test-Time Adaptation
 
@@ -106,16 +90,6 @@ python main_tta.py --scale 2 --lr_dir <LR_dir> --backbone_ckpt checkpoints/Vanil
 
 `main_tta.py` also supports `--warmup` / `--timeit` for per-image end-to-end GPU-time measurement. The `configs/*.yaml` files are reference documents for the hyper-parameters; the entry scripts use argparse defaults that mirror them.
 
-## Unit Tests
+## Acknowledgements
 
-```shell
-cd ReCoRe-main
-python tests/test_degradation.py
-python tests/test_estimator.py
-python tests/test_estimator_training.py
-python tests/test_backbone.py
-python tests/test_affinity.py
-```
-
-
-
+The implementation in this repository is based on the source code of **SRTTA**, **IRSRMamba**, and **MambaIR**. We thank the authors for sharing their code.
