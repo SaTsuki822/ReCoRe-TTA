@@ -1,0 +1,42 @@
+{
+  "conclusion": "Training is numerically stable and the checkpoint is structurally compatible. The final model improves on early checkpoints, but clean-input reconstruction is substantially below bicubic and mixed-degradation gains are limited; suitable for preliminary TTA pipeline comparisons, not yet a strong final source baseline.",
+  "checkpoint": {
+    "path": "checkpoints/backbone_x2/backbone_x2.pt",
+    "parameters": 26457700,
+    "state_tensors": 1240,
+    "strict_load": true,
+    "finite_weights_and_output": true,
+    "matches_epoch99": true
+  },
+  "curve": "training_curve.json",
+  "evaluation": "evaluation.json",
+  "breakdown": "evaluation_breakdown.json",
+  "degradation_replay": "degradation_check.json",
+  "sampling_check": {
+    "setting": "PairedSRDataset, gt_size=128, length=8, batch_size=1, num_workers=2, default persistent_workers=False",
+    "same_hr_in_adjacent_worker_pairs": [
+      true,
+      true,
+      true,
+      true
+    ],
+    "same_hr_next_epoch": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      true
+    ],
+    "original_training_batch_size_and_num_workers": "not recorded in state_dict; awaiting user confirmation"
+  },
+  "interpretation_limits": [
+    "Evaluation is 16 fixed HR128 center crops, with synthesized x2 inputs; not a full benchmark. Local supplied LR/HR folders inspected are x4.",
+    "No held-out validation loop or validation-based best checkpoint is implemented in the current backbone trainer.",
+    "Old JPEG replay is a controlled sample, not an exact replay of original training batches. Its near-black inputs can impair training, but this check does not isolate the contribution of each issue to final quality."
+  ],
+  "backbone_training_source_modified": false,
+  "weights_modified": false
+}

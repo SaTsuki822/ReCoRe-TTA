@@ -1,0 +1,587 @@
+{
+  "protocol": "64 M3FD center crops; old and corrected full_degradation with seeds 3407+i; not an exact replay of original random training crops.",
+  "samples": 64,
+  "quantization_active": 30,
+  "old_quantized_nearly_black_count": 23,
+  "new_quantized_nearly_black_count": 0,
+  "old_quantized_mean_zero_fraction": 0.8609375,
+  "new_quantized_mean_zero_fraction": 0.0025553385416666667,
+  "per_case": [
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00000.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.10206648707389832,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.10206648707389832
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00066.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.03631014749407768,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.03631014749407768
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00133.png",
+      "quantization_active": true,
+      "jpeg_quality": 85.688720703125,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.037353515625,
+      "new_std": 0.0842180848121643
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00199.png",
+      "quantization_active": true,
+      "jpeg_quality": 66.91822814941406,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0341796875,
+      "new_std": 0.14885178208351135
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00266.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.001220703125,
+      "old_std": 0.0828511193394661,
+      "new_zero_fraction": 0.001220703125,
+      "new_std": 0.0828511193394661
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00333.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.029162324965000153,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.029162324965000153
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00399.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.03715166449546814,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.03715166449546814
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00466.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.06481670588254929,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.06481670588254929
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00533.png",
+      "quantization_active": true,
+      "jpeg_quality": 65.97099304199219,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.04165611043572426
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00599.png",
+      "quantization_active": true,
+      "jpeg_quality": 65.4315185546875,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.017774101346731186
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00666.png",
+      "quantization_active": true,
+      "jpeg_quality": 86.39924621582031,
+      "old_zero_fraction": 0.9375,
+      "old_std": 0.0832907184958458,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.13260671496391296
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00733.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.17559970915317535,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.17559970915317535
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00799.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.000244140625,
+      "old_std": 0.11384312063455582,
+      "new_zero_fraction": 0.000244140625,
+      "new_std": 0.11384312063455582
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00866.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.09726665169000626,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.09726665169000626
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00933.png",
+      "quantization_active": true,
+      "jpeg_quality": 62.91082000732422,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.000732421875,
+      "new_std": 0.20515216886997223
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/00999.png",
+      "quantization_active": true,
+      "jpeg_quality": 74.55194854736328,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.000244140625,
+      "new_std": 0.034180041402578354
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01066.png",
+      "quantization_active": true,
+      "jpeg_quality": 81.60360717773438,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.00048828125,
+      "new_std": 0.1145566925406456
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01133.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.004150390625,
+      "old_std": 0.027997560799121857,
+      "new_zero_fraction": 0.004150390625,
+      "new_std": 0.027997560799121857
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01199.png",
+      "quantization_active": true,
+      "jpeg_quality": 60.89674377441406,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.000244140625,
+      "new_std": 0.051214657723903656
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01266.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.07202614098787308,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.07202614098787308
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01333.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.13286593556404114,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.13286593556404114
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01399.png",
+      "quantization_active": true,
+      "jpeg_quality": 80.04994201660156,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.022325538098812103
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01466.png",
+      "quantization_active": true,
+      "jpeg_quality": 75.65632629394531,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.2202582061290741
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01532.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.024675561115145683,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.024675561115145683
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01599.png",
+      "quantization_active": true,
+      "jpeg_quality": 66.38532257080078,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.10106372088193893
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01666.png",
+      "quantization_active": true,
+      "jpeg_quality": 66.6693115234375,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.09033765643835068
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01732.png",
+      "quantization_active": true,
+      "jpeg_quality": 88.34715270996094,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.02674141712486744
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01799.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.17751316726207733,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.17751316726207733
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01866.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.09586961567401886,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.09586961567401886
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01932.png",
+      "quantization_active": true,
+      "jpeg_quality": 83.00996398925781,
+      "old_zero_fraction": 0.908203125,
+      "old_std": 0.12141260504722595,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.1896965503692627
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/01999.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0048828125,
+      "old_std": 0.07484088093042374,
+      "new_zero_fraction": 0.0048828125,
+      "new_std": 0.07484088093042374
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02066.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.15140961110591888,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.15140961110591888
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02132.png",
+      "quantization_active": true,
+      "jpeg_quality": 51.978233337402344,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.21808549761772156
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02199.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.00048828125,
+      "old_std": 0.19659683108329773,
+      "new_zero_fraction": 0.00048828125,
+      "new_std": 0.19659683108329773
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02266.png",
+      "quantization_active": true,
+      "jpeg_quality": 51.68975830078125,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.021075516939163208
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02332.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.000244140625,
+      "old_std": 0.06476691365242004,
+      "new_zero_fraction": 0.000244140625,
+      "new_std": 0.06476691365242004
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02399.png",
+      "quantization_active": true,
+      "jpeg_quality": 99.02124786376953,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.035425182431936264,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.03960195928812027
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02466.png",
+      "quantization_active": true,
+      "jpeg_quality": 83.48336791992188,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.019823206588625908
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02532.png",
+      "quantization_active": true,
+      "jpeg_quality": 49.06741714477539,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.04295925423502922
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02599.png",
+      "quantization_active": true,
+      "jpeg_quality": 63.892372131347656,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.01283821277320385
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02666.png",
+      "quantization_active": true,
+      "jpeg_quality": 39.66542434692383,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.03515562415122986
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02732.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.29325568675994873,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.29325568675994873
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02799.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.18823912739753723,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.18823912739753723
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02865.png",
+      "quantization_active": true,
+      "jpeg_quality": 45.146209716796875,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.09520081430673599
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02932.png",
+      "quantization_active": true,
+      "jpeg_quality": 66.76049041748047,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.14082759618759155
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/02999.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.06922970712184906,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.06922970712184906
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03065.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.17397725582122803,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.17397725582122803
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03132.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.16555729508399963,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.16555729508399963
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03199.png",
+      "quantization_active": true,
+      "jpeg_quality": 99.01406860351562,
+      "old_zero_fraction": 0.032958984375,
+      "old_std": 0.049882154911756516,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.07977434992790222
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03265.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.18670809268951416,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.18670809268951416
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03332.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.021528754383325577,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.021528754383325577
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03399.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.15304003655910492,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.15304003655910492
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03465.png",
+      "quantization_active": true,
+      "jpeg_quality": 94.46155548095703,
+      "old_zero_fraction": 0.176025390625,
+      "old_std": 0.20742788910865784,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.09197799116373062
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03532.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.10333575308322906,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.10333575308322906
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03599.png",
+      "quantization_active": true,
+      "jpeg_quality": 37.841278076171875,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.00341796875,
+      "new_std": 0.09034153074026108
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03665.png",
+      "quantization_active": true,
+      "jpeg_quality": 83.25105285644531,
+      "old_zero_fraction": 0.6875,
+      "old_std": 0.20170924067497253,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.23904281854629517
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03732.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.15367703139781952,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.15367703139781952
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03799.png",
+      "quantization_active": true,
+      "jpeg_quality": 77.55441284179688,
+      "old_zero_fraction": 1.0,
+      "old_std": 0.0,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.11897440999746323
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03865.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.17697417736053467,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.17697417736053467
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03932.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.09087936580181122,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.09087936580181122
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/03999.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.22275041043758392,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.22275041043758392
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/04065.png",
+      "quantization_active": true,
+      "jpeg_quality": 94.59075927734375,
+      "old_zero_fraction": 0.0859375,
+      "old_std": 0.12300597876310349,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.16386820375919342
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/04132.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.17521490156650543,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.17521490156650543
+    },
+    {
+      "path": "/mnt/workspace/lyk/dataset/M3FD/ir/04199.png",
+      "quantization_active": false,
+      "jpeg_quality": 0.0,
+      "old_zero_fraction": 0.0,
+      "old_std": 0.17672182619571686,
+      "new_zero_fraction": 0.0,
+      "new_std": 0.17672182619571686
+    }
+  ]
+}

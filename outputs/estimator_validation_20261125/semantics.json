@@ -1,0 +1,28 @@
+{
+  "baseline_ref": "436440381ded33924fc0c055d6d90facae162c9f",
+  "split": "checkpoints/estimator/data_split.json",
+  "baseline": {
+    "samples": 16,
+    "jpeg_q50_input_mae": 0.33303319942206144,
+    "jpeg_q50_pillow_mae": 0.3329885764978826,
+    "jpeg_zero_fraction": 1.0,
+    "oracle_retained_synthesis_loss": 0.34938515443354845,
+    "noise_strength_recovery": {
+      "ground_truth": 0.7,
+      "initial": 0.8,
+      "recovered": 0.0
+    }
+  },
+  "fixed": {
+    "samples": 16,
+    "jpeg_q50_input_mae": 0.0052961673645768315,
+    "jpeg_q50_pillow_mae": 0.0008162535732481047,
+    "jpeg_zero_fraction": 0.0,
+    "oracle_retained_synthesis_loss": 0.0,
+    "noise_strength_recovery": {
+      "ground_truth": 0.7,
+      "initial": 0.8,
+      "recovered": 0.6997759342193604
+    }
+  }
+}

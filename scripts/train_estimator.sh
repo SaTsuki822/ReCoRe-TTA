@@ -5,6 +5,6 @@ cd "$(dirname "$0")/.."
 # 用法：bash scripts/train_estimator.sh --img_dir /path/to/M3FD/ir
 # 自动按源图留出 10% 验证、10% 校准；可另传 --val_dir / --cal_dir。
 exec python -m src.estimator.train \
-  --save_dir checkpoints/estimator \
+  --save_dir checkpoints/estimator_v2 \
   --crop_size 128 --length 20000 --epochs 30 --batch_size 16 \
-  --lr 1e-3 --calibrate --seed 3407 "$@"
+  --lr 1e-4 --calibrate --seed 3407 "$@"

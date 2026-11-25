@@ -21,7 +21,7 @@ from torch.utils.data import DataLoader
 
 from src.degradation import sample_degradation, apply_readout_noise, apply_bad_pixels, apply_all
 from src.estimator import DegradationEstimator, DegradationPairDataset, temperature_scale, compute_losses
-from src.estimator.data import discover_images
+from src.estimator.data import discover_images, _to_single_gray
 from src.estimator.train import build_datasets, evaluate, make_parser, train, _backward_step
 
 
@@ -62,6 +62,13 @@ class TrainingTests(unittest.TestCase):
                            (apply_bad_pixels, {"p_bad": .3, "v_bad": 1})):
             self.assertFalse(torch.equal(op(x, **kwargs), op(x, **kwargs)))
             self.assertTrue(torch.equal(op(x, seed=7, **kwargs), op(x, seed=7, **kwargs)))
+
+    def test_dark_rgb_and_uint16_normalization(self):
+        dark = np.ones((8, 8, 3), dtype=np.uint8)
+        self.assertTrue(np.allclose(_to_single_gray(dark), 1 / 255))
+        infrared = np.full((8, 8), 32768, dtype=np.uint16)
+        self.assertTrue(np.allclose(_to_single_gray(infrared), 32768 / 65535))
+        self.assertEqual(_to_single_gray(dark[..., :1]).shape, (8, 8))
 
     def test_empty_or_missing_real_data_is_rejected(self):
         empty = self.root / "empty"
@@ -140,6 +147,37 @@ class TrainingTests(unittest.TestCase):
         self.assertTrue(all(torch.equal(v, before[k]) for k, v in model.state_dict().items()))
         self.assertEqual(len(first["per_class"]), 9)
         self.assertEqual(len(first["per_param_mae"]), 18)
+        self.assertIn("retained_macro_f1", first)
+        self.assertIn("recall", first["per_class"]["stripe"])
+        self.assertIn("all_positive_retained_macro_f1", first["baselines"])
+
+    def test_calibration_is_cached_frozen_and_never_worse_on_its_split(self):
+        datasets, _ = build_datasets(self.args("--calibrate"))
+        model = DegradationEstimator()
+        before = {k: v.clone() for k, v in model.state_dict().items()}
+        loader = DataLoader(datasets["cal"], batch_size=2)
+        with patch.object(model, "forward", wraps=model.forward) as forward:
+            T, metrics = temperature_scale(model, loader, epochs=3, return_metrics=True)
+        self.assertEqual(forward.call_count, len(loader))
+        self.assertEqual(metrics["samples"], 4)
+        self.assertLessEqual(metrics["bce_after"], metrics["bce_before"])
+        self.assertGreater(T, 0)
+        self.assertTrue(all(torch.equal(v, before[k]) for k, v in model.state_dict().items()))
+
+    def test_reported_baselines_match_an_actual_constant_predictor(self):
+        class ConstantPredictor(torch.nn.Module):
+            def forward(self, x, xp):
+                return (x.new_ones((len(x), 9)), x.new_full((len(x), 18), .5),
+                        x.new_zeros((len(x), 1)))
+
+        datasets, _ = build_datasets(self.args())
+        metrics = evaluate(ConstantPredictor(), DataLoader(datasets["val"], batch_size=2), "cpu")
+        baseline = metrics["baselines"]
+        self.assertAlmostEqual(metrics["macro_f1"], baseline["all_positive_macro_f1"])
+        self.assertAlmostEqual(metrics["retained_macro_f1"], baseline["all_positive_retained_macro_f1"])
+        self.assertAlmostEqual(metrics["active_param_mae"], baseline["midpoint_active_param_mae"])
+        self.assertAlmostEqual(metrics["retained_active_param_mae"],
+                               baseline["midpoint_retained_active_param_mae"])
 
     def test_real_image_training_selects_best_and_calibrates(self):
         args = self.args("--calibrate")

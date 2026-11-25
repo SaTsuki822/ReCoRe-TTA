@@ -25,6 +25,11 @@ def _next_seed(rng):
     return int(torch.randint(0, 2 ** 31, (1,), generator=rng).item())
 
 
+def _operator_seed(seed, index):
+    """Independent reproducible streams for different degradation families."""
+    return None if seed is None else (int(seed) + 104729 * (index + 1)) % (2 ** 63)
+
+
 def sample_degradation(rng: Optional[torch.Generator] = None, device=None,
                        dtype=torch.float32) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
     """Sample one degradation. Returns (active, raw, norm).
@@ -67,7 +72,7 @@ def apply_retain(x: torch.Tensor, norm_params: torch.Tensor, active=None,
     for i in P.RETAIN_ORDER:
         if active is not None and float(active[i]) <= 0.5:
             continue
-        x = ops.apply_single(i, x, segs[i], seed)
+        x = ops.apply_single(i, x, segs[i], _operator_seed(seed, i))
     return x
 
 
@@ -79,7 +84,7 @@ def apply_discard(x: torch.Tensor, norm_params: torch.Tensor, active=None,
     for i in P.DISCARD_INDICES:
         if active is not None and float(active[i]) <= 0.5:
             continue
-        x = ops.apply_single(i, x, segs[i], seed)
+        x = ops.apply_single(i, x, segs[i], _operator_seed(seed, i))
     return x
 
 

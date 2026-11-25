@@ -38,10 +38,17 @@ def discover_images(img_dir):
 
 def _to_single_gray(img):
     """Convert a numpy image (HWC or single channel, uint8/float) to single-channel [0,1]."""
+    # Preserve the source dtype before RGB conversion promotes uint8 to float.
+    # Otherwise a dark RGB image with max==1 is incorrectly treated as [0,1].
+    source_dtype = img.dtype
     if img.ndim == 3:
-        img = img[:, :, :3]
-        img = 0.299 * img[..., 0] + 0.587 * img[..., 1] + 0.114 * img[..., 2]
-    if img.dtype == np.uint8 or float(img.max()) > 1.0:
+        if img.shape[-1] == 1:
+            img = img[..., 0]
+        else:
+            img = 0.299 * img[..., 0] + 0.587 * img[..., 1] + 0.114 * img[..., 2]
+    if source_dtype in (np.dtype("uint8"), np.dtype("uint16")):
+        img = img.astype(np.float32) / np.iinfo(source_dtype).max
+    elif float(img.max()) > 1.0:
         img = img.astype(np.float32) / 255.0
     else:
         img = img.astype(np.float32)

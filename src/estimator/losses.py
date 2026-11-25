@@ -25,8 +25,26 @@ def _apply_retain_batch(x, phi, active, seed=None):
     """Apply the retained operators per sample and stack into a batch."""
     outs = []
     for b in range(x.shape[0]):
-        outs.append(apply_retain(x[b:b + 1], phi[b], active[b], seed))
+        sample_seed = None if seed is None else (int(seed) + 1009 * b) % (2 ** 63)
+        outs.append(apply_retain(x[b:b + 1], phi[b], active[b], sample_seed))
     return torch.cat(outs, dim=0)
+
+
+@torch.no_grad()
+def confidence_targets(x, x_prime, q_logit, phi, seed=None, tau_c=0.05):
+    """Observable reconstruction reliability with predicted labels, as at TTA.
+
+    Unlike L_syn, this compares the retained reconstruction with the full
+    observation: irreversible effects should lower the confidence gate.
+    """
+    active = (q_logit > 0).to(x.dtype)
+    # Match the harder-view fallback when no retained family passes the threshold.
+    missing = active[:, :6].sum(1) == 0
+    top = q_logit[:, :6].argmax(1)
+    active[missing, top[missing]] = 1
+    reconstruction = _apply_retain_batch(x, phi, active, seed)
+    error = (reconstruction - x_prime).square().flatten(1).mean(1)
+    return torch.exp(-error / tau_c).unsqueeze(1).clamp(1e-4, 1.0)
 
 
 def compute_losses(q_logit, phi, c_logit, x, x_prime, active, norm_target, seed=None,
@@ -49,14 +67,19 @@ def compute_losses(q_logit, phi, c_logit, x, x_prime, active, norm_target, seed=
     mask = activation_mask(active)  # (B,18)
     L_reg = masked_smooth_l1(phi, norm_target, mask)
 
-    # synthesis consistency (pseudo-Huber)
+    # Replay retained GT with common random numbers. Comparing to x_prime would
+    # penalize irreversible effects and unrelated noise draws, even at exact GT,
+    # encouraging the estimator to underestimate stochastic noise amplitudes.
+    if seed is None:
+        seed = int(torch.randint(0, 2 ** 31, (1,)).item())
     x_tilde = _apply_retain_batch(x, phi, active, seed)  # (B,1,H,W)
-    sq_error = ((x_tilde - x_prime) ** 2).reshape(x.shape[0], -1).mean(dim=1)  # (B,)
+    with torch.no_grad():
+        retained_target = _apply_retain_batch(x, norm_target, active, seed)
+    sq_error = ((x_tilde - retained_target) ** 2).reshape(x.shape[0], -1).mean(dim=1)
     L_syn = (torch.sqrt(sq_error + eps_E ** 2) - eps_E).mean()
 
     # confidence loss (target = exp(-e_syn/tau_c), detached)
-    with torch.no_grad():
-        c_star = torch.exp(-sq_error / tau_c).unsqueeze(1).clamp(1e-4, 1.0)  # (B,1)
+    c_star = confidence_targets(x, x_prime, q_logit, phi, seed, tau_c)
     L_conf = F.binary_cross_entropy_with_logits(c_logit, c_star)
 
     L_E = L_cls + lambda_reg * L_reg + lambda_syn * L_syn + lambda_conf * L_conf

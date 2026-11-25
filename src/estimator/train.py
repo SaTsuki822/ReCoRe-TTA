@@ -106,6 +106,7 @@ def evaluate(model, loader, device):
     totals = {k: 0.0 for k in ("loss", "L_cls", "L_reg", "L_syn", "L_conf")}
     tp, fp, fn = (torch.zeros(9, device=device) for _ in range(3))
     abs_error = torch.zeros(18, device=device)
+    midpoint_error = torch.zeros(18, device=device)
     param_count = torch.zeros(18, device=device)
     count = 0
     for batch_idx, batch in enumerate(loader):
@@ -128,13 +129,28 @@ def evaluate(model, loader, device):
         fn += (~pred & target).sum(0)
         mask = activation_mask(active)
         abs_error += ((phi - norm).abs() * mask).sum(0)
+        midpoint_error += ((0.5 - norm).abs() * mask).sum(0)
         param_count += mask.sum(0)
     metrics = {key: value / count for key, value in totals.items()}
     f1 = 2 * tp / (2 * tp + fp + fn).clamp_min(1)
     metrics["macro_f1"] = f1.mean().item()
     metrics["active_param_mae"] = (abs_error.sum() / param_count.sum().clamp_min(1)).item()
+    support = tp + fn
+    all_positive_f1 = 2 * support / (count + support).clamp_min(1)
+    metrics["retained_macro_f1"] = f1[:6].mean().item()
+    metrics["retained_active_param_mae"] = (
+        abs_error[:12].sum() / param_count[:12].sum().clamp_min(1)).item()
+    metrics["baselines"] = {
+        "all_positive_macro_f1": all_positive_f1.mean().item(),
+        "all_positive_retained_macro_f1": all_positive_f1[:6].mean().item(),
+        "midpoint_active_param_mae": (midpoint_error.sum() / param_count.sum().clamp_min(1)).item(),
+        "midpoint_retained_active_param_mae": (
+            midpoint_error[:12].sum() / param_count[:12].sum().clamp_min(1)).item()}
     metrics["per_class"] = {
-        spec.name: {"f1": f1[i].item(), "support": int((tp[i] + fn[i]).item())}
+        spec.name: {"f1": f1[i].item(), "support": int(support[i].item()),
+                    "precision": (tp[i] / (tp[i] + fp[i]).clamp_min(1)).item(),
+                    "recall": (tp[i] / support[i].clamp_min(1)).item(),
+                    "predicted_positive": int((tp[i] + fp[i]).item())}
         for i, spec in enumerate(DEGRADATIONS)}
     metrics["per_param_mae"] = {
         spec.name + "." + param.name:
@@ -163,7 +179,8 @@ def train(args):
                             num_workers=args.num_workers)
     optimizer = torch.optim.Adam(model.parameters(), lr=args.lr)
     os.makedirs(args.save_dir, exist_ok=True)
-    manifest = {"mode": "synthetic" if args.synthetic else "real", "args": vars(args),
+    manifest = {"training_recipe": "retained_replay_v2",
+                "mode": "synthetic" if args.synthetic else "real", "args": vars(args),
                 "sources": sources,
                 "split_seeds": {k: v.seed for k, v in datasets.items()}}
     with open(os.path.join(args.save_dir, "data_split.json"), "w") as handle:
@@ -201,16 +218,18 @@ def train(args):
             if not all(torch.isfinite(torch.tensor(v)) for v in
                        (training["loss"], validation["loss"])):
                 raise RuntimeError("Non-finite training/validation loss")
-            print("[epoch %d] train=%.4f val=%.4f macro_F1=%.4f active_MAE=%.4f" %
+            print("[epoch %d] train=%.4f val=%.4f macro_F1=%.4f active_MAE=%.4f retain_F1=%.4f retain_MAE=%.4f" %
                   (epoch + 1, training["loss"], validation["loss"],
-                   validation["macro_f1"], validation["active_param_mae"]))
+                   validation["macro_f1"], validation["active_param_mae"],
+                   validation["retained_macro_f1"], validation["retained_active_param_mae"]))
             history.write(json.dumps({"epoch": epoch + 1, "train": training,
                                       "val": validation}) + "\n")
             history.flush()
             if validation["loss"] < best_loss:
                 best_loss, best_epoch = validation["loss"], epoch + 1
                 torch.save({"state_dict": model.state_dict(), "temperature": 1.0,
-                            "epoch": best_epoch, "val_metrics": validation}, best_path)
+                            "epoch": best_epoch, "val_metrics": validation,
+                            "training_recipe": "retained_replay_v2"}, best_path)
             if (epoch + 1) % args.save_every == 0:
                 torch.save(model.state_dict(), os.path.join(
                     args.save_dir, "estimator_epoch%d.pt" % (epoch + 1)))
@@ -221,7 +240,10 @@ def train(args):
     if args.calibrate:
         cal_loader = DataLoader(datasets["cal"], batch_size=args.batch_size,
                                 shuffle=False, num_workers=args.num_workers)
-        T = temperature_scale(model, cal_loader)
+        T, calibration_metrics = temperature_scale(model, cal_loader, return_metrics=True)
+        best["calibration_metrics"] = calibration_metrics
+        with open(os.path.join(args.save_dir, "calibration.json"), "w") as handle:
+            json.dump(calibration_metrics, handle, indent=2)
         print("calibrated temperature = %.4f (held-out calibration split)" % T)
     best["temperature"] = T
     final_path = os.path.join(args.save_dir, "estimator_final.pt")
@@ -244,7 +266,7 @@ def make_parser():
     parser.add_argument("--cal_length", type=int, default=1000, help="fixed calibration pairs")
     parser.add_argument("--batch_size", type=int, default=16)
     parser.add_argument("--epochs", type=int, default=20)
-    parser.add_argument("--lr", type=float, default=1e-3)
+    parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--max_grad_norm", type=float, default=1.0,
                         help="clip total gradient norm; non-finite gradients stop before optimizer update")
     parser.add_argument("--descriptor_dim", type=int, default=128)

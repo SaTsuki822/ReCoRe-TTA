@@ -143,7 +143,8 @@ def _dct_basis(n=8):
     """n x n orthonormal DCT-II basis matrix."""
     i = torch.arange(n, dtype=torch.float32).view(n, 1)
     j = torch.arange(n, dtype=torch.float32).view(1, n)
-    basis = torch.cos(math.pi * (2 * i + 1) * j / (2 * n))
+    # Rows are frequencies; columns are spatial positions (D @ block @ D.T).
+    basis = torch.cos(math.pi * i * (2 * j + 1) / (2 * n))
     basis[0, :] /= math.sqrt(2.0)
     return basis * math.sqrt(2.0 / n)
 
@@ -161,16 +162,22 @@ _JPEG_QTABLE = torch.tensor([
 
 
 def apply_jpeg(x, quality):
-    """JPEG compression: 8x8 block DCT + quality-based quantization + IDCT."""
+    """Grayscale JPEG approximation on [0,1], using 8-bit luminance quantizers.
+
+    Work in the level-shifted 8-bit domain. Entropy coding is unnecessary for
+    synthesis; this is not a byte-for-byte JPEG encoder.
+    """
     B, C, H, W = x.shape
     n = 8
     ph, pw = (n - H % n) % n, (n - W % n) % n
-    xp = F.pad(x, (0, pw, 0, ph), mode="reflect")
+    xp = F.pad(x.clamp(0, 1), (0, pw, 0, ph), mode="replicate") * 255.0 - 128.0
     Hp, Wp = xp.shape[-2], xp.shape[-1]
-    basis = _dct_basis(n).to(x.device)  # (8,8)
+    basis = _dct_basis(n).to(device=x.device, dtype=x.dtype)  # (8,8)
     q = float(quality)
+    if not math.isfinite(q) or not 1 <= q <= 100:
+        raise ValueError("JPEG quality must be finite and in [1,100]")
     s = 5000.0 / q if q < 50.0 else 200.0 - 2.0 * q
-    qstep = torch.clamp((_JPEG_QTABLE.to(x.device) * s + 50.0) / 100.0, min=1.0)
+    qstep = ((_JPEG_QTABLE.to(x) * s + 50.0) / 100.0).floor().clamp(1, 255)
     xflat = xp.reshape(B * C, 1, Hp, Wp)
     blocks = xflat.reshape(B * C, Hp // n, n, Wp // n, n).permute(0, 1, 3, 2, 4).reshape(-1, n, n)
     dct = torch.einsum("ij,bjk,kl->bil", basis, blocks, basis.t())
@@ -178,7 +185,7 @@ def apply_jpeg(x, quality):
     idct = torch.einsum("ij,bjk,kl->bil", basis.t(), qdct, basis)
     out = idct.reshape(B * C, Hp // n, Wp // n, n, n).permute(0, 1, 3, 2, 4).reshape(B * C, 1, Hp, Wp)
     out = out.reshape(B, C, Hp, Wp)
-    return out[:, :, :H, :W]
+    return ((out[:, :, :H, :W] + 128.0) / 255.0).clamp(0, 1)
 
 
 def apply_saturation_agc(x, p_clip, gamma):
