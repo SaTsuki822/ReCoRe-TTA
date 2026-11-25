@@ -1,0 +1,15 @@
+{
+  "old_checkpoint": "checkpoints/backbone_x2/backbone_x2.pt",
+  "strict_load_missing": [],
+  "strict_load_unexpected": [],
+  "old_vs_new_output_max_abs_cpu": 0.0,
+  "input_shape": [
+    1,
+    1,
+    8,
+    8
+  ],
+  "all_parameters_nonempty_and_finite": true,
+  "original_initialization_warning_reproduced": true,
+  "fixed_initialization_warning_absent": true
+}

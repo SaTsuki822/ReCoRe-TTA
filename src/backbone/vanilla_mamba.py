@@ -136,11 +136,12 @@ class _DropPath(nn.Module):
 class ChannelAttention(nn.Module):
     def __init__(self, num_feat, squeeze_factor=16):
         super().__init__()
+        hidden = max(1, num_feat // squeeze_factor)
         self.attention = nn.Sequential(
             nn.AdaptiveAvgPool2d(1),
-            nn.Conv2d(num_feat, num_feat // squeeze_factor, 1, padding=0),
+            nn.Conv2d(num_feat, hidden, 1, padding=0),
             nn.ReLU(inplace=True),
-            nn.Conv2d(num_feat // squeeze_factor, num_feat, 1, padding=0),
+            nn.Conv2d(hidden, num_feat, 1, padding=0),
             nn.Sigmoid())
 
     def forward(self, x):
@@ -152,10 +153,11 @@ class CAB(nn.Module):
         super().__init__()
         if is_light_sr:
             compress_ratio = 6
+        hidden = max(1, num_feat // compress_ratio)
         self.cab = nn.Sequential(
-            nn.Conv2d(num_feat, num_feat // compress_ratio, 3, 1, 1),
+            nn.Conv2d(num_feat, hidden, 3, 1, 1),
             nn.GELU(),
-            nn.Conv2d(num_feat // compress_ratio, num_feat, 3, 1, 1),
+            nn.Conv2d(hidden, num_feat, 3, 1, 1),
             ChannelAttention(num_feat, squeeze_factor))
 
     def forward(self, x):
@@ -406,10 +408,11 @@ class DWT(nn.Module):
 class ChannelAttentionModified(nn.Module):
     def __init__(self, in_channels, reduction_ratio=16):
         super().__init__()
+        hidden = max(1, in_channels // reduction_ratio)
         self.max_pool = nn.AdaptiveMaxPool2d(1)
-        self.fc1 = nn.Conv2d(in_channels, in_channels // reduction_ratio, 1, bias=False)
+        self.fc1 = nn.Conv2d(in_channels, hidden, 1, bias=False)
         self.relu = nn.ReLU()
-        self.fc2 = nn.Conv2d(in_channels, in_channels, 1, bias=False)
+        self.fc2 = nn.Conv2d(hidden, in_channels, 1, bias=False)
         self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
@@ -422,6 +425,25 @@ class WaveletAttention(nn.Module):
         super().__init__()
         self.dwt = DWT()
         self.channel_attention = ChannelAttentionModified(in_channels, reduction_ratio)
+
+    def _load_from_state_dict(self, state_dict, prefix, local_metadata, strict,
+                              missing_keys, unexpected_keys, error_msgs):
+        # Historical checkpoints contain an unused zero-channel attention branch.
+        # Only repair its known legacy shapes; active backbone weights still load
+        # strictly. This branch remains unused by forward, preserving old outputs.
+        attention = self.channel_attention
+        key = prefix + "channel_attention.fc1.weight"
+        old = state_dict.get(key)
+        if old is not None and tuple(old.shape) == (0, attention.fc1.in_channels, 1, 1):
+            state_dict[key] = old.new_zeros(attention.fc1.weight.shape)
+        key = prefix + "channel_attention.fc2.weight"
+        old = state_dict.get(key)
+        channels = attention.fc2.out_channels
+        if (old is not None and tuple(old.shape) == (channels, channels, 1, 1)
+                and old.shape != attention.fc2.weight.shape):
+            state_dict[key] = old.new_zeros(attention.fc2.weight.shape)
+        super()._load_from_state_dict(state_dict, prefix, local_metadata, strict,
+                                     missing_keys, unexpected_keys, error_msgs)
 
     def forward(self, x):
         cA, cH, cV, cD = self.dwt(x)
