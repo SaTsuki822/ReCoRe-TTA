@@ -29,25 +29,32 @@ def calculate_psnr(img1, img2, crop_border: int = 0, data_range: float = 1.0) ->
 
 
 def _gaussian_window(size: int = 11, sigma: float = 1.5):
-    ax = np.arange(-size // 2, size // 2 + 1, dtype=np.float64)
+    # -size // 2 is -6 for size=11, accidentally creating a 12x12 window.
+    ax = np.arange(size, dtype=np.float64) - (size - 1) / 2
     g = np.exp(-(ax ** 2) / (2.0 * sigma ** 2))
     g /= g.sum()
     return np.outer(g, g)
 
 
 def calculate_ssim(img1, img2, crop_border: int = 0, data_range: float = 1.0) -> float:
-    """SSIM with an 11x11 Gaussian window (sigma=1.5)."""
+    """SSIM with an 11x11 Gaussian window (sigma=1.5), valid window centers."""
     img1 = _crop(img1.astype(np.float64), crop_border)
     img2 = _crop(img2.astype(np.float64), crop_border)
+    if img1.shape != img2.shape or img1.ndim != 2 or min(img1.shape) < 11:
+        raise ValueError("SSIM requires same-shape grayscale images >=11x11 after border crop")
     C1 = (0.01 * data_range) ** 2
     C2 = (0.03 * data_range) ** 2
     win = _gaussian_window()
-    mu1 = _conv2d(img1, win, "reflect")
-    mu2 = _conv2d(img2, win, "reflect")
+
+    def filter_valid(image):
+        return cv2.filter2D(image, -1, win)[5:-5, 5:-5]
+
+    mu1 = filter_valid(img1)
+    mu2 = filter_valid(img2)
     mu1_sq, mu2_sq, mu1_mu2 = mu1 * mu1, mu2 * mu2, mu1 * mu2
-    sigma1_sq = _conv2d(img1 * img1, win, "reflect") - mu1_sq
-    sigma2_sq = _conv2d(img2 * img2, win, "reflect") - mu2_sq
-    sigma12 = _conv2d(img1 * img2, win, "reflect") - mu1_mu2
+    sigma1_sq = filter_valid(img1 * img1) - mu1_sq
+    sigma2_sq = filter_valid(img2 * img2) - mu2_sq
+    sigma12 = filter_valid(img1 * img2) - mu1_mu2
     ssim_map = ((2 * mu1_mu2 + C1) * (2 * sigma12 + C2)) / \
                ((mu1_sq + mu2_sq + C1) * (sigma1_sq + sigma2_sq + C2))
     return float(ssim_map.mean())

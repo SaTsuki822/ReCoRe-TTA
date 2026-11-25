@@ -78,7 +78,13 @@ def _selective_scan_ref(u, delta, A, B, C, D=None, z=None, delta_bias=None,
 
 
 def _selective_scan_dispatch():
-    return selective_scan_fn if selective_scan_fn is not None else _selective_scan_ref
+    return _selective_scan_by_device
+
+
+def _selective_scan_by_device(u, *args, **kwargs):
+    # Installed mamba-ssm CUDA kernels cannot process --cpu / test inputs.
+    backend = selective_scan_fn if u.is_cuda and selective_scan_fn is not None else _selective_scan_ref
+    return backend(u, *args, **kwargs)
 
 
 # ----------------------------------------------------------------------------------

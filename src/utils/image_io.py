@@ -25,12 +25,27 @@ def set_seed(seed: int = 3407):
 def read_img_gray(path) -> np.ndarray:
     """Read an image as single-channel [0,1] float (H,W)."""
     img = imageio.imread(path)
+    source_dtype = img.dtype
     if img.ndim == 3:
-        img = img[:, :, :3].astype(np.float32)
-        img = 0.299 * img[..., 0] + 0.587 * img[..., 1] + 0.114 * img[..., 2]
+        if img.shape[-1] == 1:
+            img = img[..., 0]
+        elif img.shape[-1] in (3, 4):
+            img = img[:, :, :3].astype(np.float32)
+            img = 0.299 * img[..., 0] + 0.587 * img[..., 1] + 0.114 * img[..., 2]
+        else:
+            raise ValueError("Unsupported image channels in %s" % path)
+    if img.ndim != 2 or img.size == 0 or not np.isfinite(img).all():
+        raise ValueError("Expected a finite nonempty grayscale/RGB image: %s" % path)
     img = img.astype(np.float32)
-    if img.max() > 1.0:
+    if source_dtype in (np.dtype("uint8"), np.dtype("uint16")):
+        img /= np.iinfo(source_dtype).max
+    elif source_dtype == np.dtype("int32") and img.min() >= 0 and img.max() <= 65535:
+        # Some imageio/Pillow versions decode 16-bit PNGs as int32.
+        img /= 65535.0
+    elif img.max() > 1.0:
         img = img / 255.0
+    if img.min() < 0 or img.max() > 1.00001:
+        raise ValueError("Image cannot be normalized to [0,1]: %s" % path)
     return np.ascontiguousarray(img)
 
 

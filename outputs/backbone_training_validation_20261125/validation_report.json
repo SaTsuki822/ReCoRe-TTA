@@ -1,0 +1,264 @@
+{
+  "real_training": "1 epoch, 2 M3FD samples; full default 26,457,700-parameter model; GPU; not a quality assessment",
+  "validation_pairs": {
+    "Result-A": 22,
+    "Result-C": 22
+  },
+  "validation": {
+    "Result-A": {
+      "images": 22,
+      "psnr": 11.954957001982505,
+      "ssim": 0.032017124925799896,
+      "per_image": [
+        {
+          "image": "fused10x2.png",
+          "psnr": 12.171426674456015,
+          "ssim": 0.03256590504077514
+        },
+        {
+          "image": "fused11x2.png",
+          "psnr": 15.449352179468034,
+          "ssim": 0.037511954022145744
+        },
+        {
+          "image": "fused12x2.png",
+          "psnr": 10.577029653694206,
+          "ssim": 0.030694966518489877
+        },
+        {
+          "image": "fused13x2.png",
+          "psnr": 10.215915666420127,
+          "ssim": 0.03149600401552324
+        },
+        {
+          "image": "fused14x2.png",
+          "psnr": 12.256203510858326,
+          "ssim": 0.03539348890095723
+        },
+        {
+          "image": "fused15x2.png",
+          "psnr": 11.199744150735768,
+          "ssim": 0.033375941495170564
+        },
+        {
+          "image": "fused16x2.png",
+          "psnr": 12.449751378447383,
+          "ssim": 0.03404735039354598
+        },
+        {
+          "image": "fused17x2.png",
+          "psnr": 13.816024140400662,
+          "ssim": 0.03389251161076284
+        },
+        {
+          "image": "fused18x2.png",
+          "psnr": 14.043067828430399,
+          "ssim": 0.022602269629252332
+        },
+        {
+          "image": "fused19x2.png",
+          "psnr": 11.2798120579484,
+          "ssim": 0.02941063811458927
+        },
+        {
+          "image": "fused1x2.png",
+          "psnr": 11.457289824470253,
+          "ssim": 0.029753204568944716
+        },
+        {
+          "image": "fused20x2.png",
+          "psnr": 10.796769489447186,
+          "ssim": 0.03516801378132639
+        },
+        {
+          "image": "fused21x2.png",
+          "psnr": 12.019580894963083,
+          "ssim": 0.031256697378344786
+        },
+        {
+          "image": "fused22x2.png",
+          "psnr": 11.2798120579484,
+          "ssim": 0.02941063811458927
+        },
+        {
+          "image": "fused2x2.png",
+          "psnr": 10.706225580308136,
+          "ssim": 0.028591221559410056
+        },
+        {
+          "image": "fused3x2.png",
+          "psnr": 14.693492587943776,
+          "ssim": 0.03683855969950903
+        },
+        {
+          "image": "fused4x2.png",
+          "psnr": 10.89125096395356,
+          "ssim": 0.031488710886580756
+        },
+        {
+          "image": "fused5x2.png",
+          "psnr": 13.846909662728093,
+          "ssim": 0.03741641694594161
+        },
+        {
+          "image": "fused6x2.png",
+          "psnr": 11.594460250641001,
+          "ssim": 0.0343688958954297
+        },
+        {
+          "image": "fused7x2.png",
+          "psnr": 10.599147222408291,
+          "ssim": 0.031068397738796275
+        },
+        {
+          "image": "fused8x2.png",
+          "psnr": 9.38848407006136,
+          "ssim": 0.02438832646661467
+        },
+        {
+          "image": "fused9x2.png",
+          "psnr": 12.277304197882684,
+          "ssim": 0.03363663559089815
+        }
+      ]
+    },
+    "Result-C": {
+      "images": 22,
+      "psnr": 12.557855630572218,
+      "ssim": 0.03343151688924762,
+      "per_image": [
+        {
+          "image": "result10x2.png",
+          "psnr": 10.45919647690695,
+          "ssim": 0.034751993222210724
+        },
+        {
+          "image": "result11x2.png",
+          "psnr": 15.424021867963377,
+          "ssim": 0.03718082368179194
+        },
+        {
+          "image": "result12x2.png",
+          "psnr": 11.309768928307912,
+          "ssim": 0.03468285748060621
+        },
+        {
+          "image": "result13x2.png",
+          "psnr": 12.64406766017835,
+          "ssim": 0.03703269330682016
+        },
+        {
+          "image": "result14x2.png",
+          "psnr": 11.770914952941258,
+          "ssim": 0.03595015296177002
+        },
+        {
+          "image": "result15x2.png",
+          "psnr": 9.788840269579296,
+          "ssim": 0.03366793858427033
+        },
+        {
+          "image": "result16x2.png",
+          "psnr": 13.829615120325629,
+          "ssim": 0.03635901548571672
+        },
+        {
+          "image": "result17x2.png",
+          "psnr": 14.700084046306669,
+          "ssim": 0.02555649999527839
+        },
+        {
+          "image": "result18x2.png",
+          "psnr": 13.810264466898483,
+          "ssim": 0.012836409756346635
+        },
+        {
+          "image": "result19x2.png",
+          "psnr": 14.258171450016956,
+          "ssim": 0.034915280691203164
+        },
+        {
+          "image": "result1x2.png",
+          "psnr": 13.720574443986436,
+          "ssim": 0.03389974571954308
+        },
+        {
+          "image": "result20x2.png",
+          "psnr": 10.139246926471237,
+          "ssim": 0.03515285607257235
+        },
+        {
+          "image": "result21x2.png",
+          "psnr": 12.2616573758383,
+          "ssim": 0.032223539451412216
+        },
+        {
+          "image": "result22x2.png",
+          "psnr": 14.258171450016956,
+          "ssim": 0.034915280691203164
+        },
+        {
+          "image": "result2x2.png",
+          "psnr": 10.361973368949894,
+          "ssim": 0.02777955597914594
+        },
+        {
+          "image": "result3x2.png",
+          "psnr": 14.496032019801511,
+          "ssim": 0.03700129291218003
+        },
+        {
+          "image": "result4x2.png",
+          "psnr": 12.586595554406932,
+          "ssim": 0.03670321635112666
+        },
+        {
+          "image": "result5x2.png",
+          "psnr": 13.096284083414861,
+          "ssim": 0.03719042950553148
+        },
+        {
+          "image": "result6x2.png",
+          "psnr": 11.153492843243066,
+          "ssim": 0.035498092790579604
+        },
+        {
+          "image": "result7x2.png",
+          "psnr": 11.96169425026628,
+          "ssim": 0.0348947383732533
+        },
+        {
+          "image": "result8x2.png",
+          "psnr": 12.233500400356707,
+          "ssim": 0.03241063651284459
+        },
+        {
+          "image": "result9x2.png",
+          "psnr": 12.008655916411712,
+          "ssim": 0.03489032203804098
+        }
+      ]
+    },
+    "mean": {
+      "psnr": 12.256406316277362,
+      "ssim": 0.03272432090752376
+    }
+  },
+  "strict_tta_load": true,
+  "best_matches_final": true,
+  "finite_weights": true,
+  "cuda_vs_cpu_dispatch_max_abs_fp32_tf32_disabled": 2.2351741790771484e-07,
+  "cuda_dispatch_equals_direct_extension": true,
+  "regression_test_functions": {
+    "test_backbone_training": 11,
+    "test_backbone_data": 2,
+    "test_backbone": 4,
+    "test_degradation": 9
+  },
+  "regression_result": "all passed",
+  "readme_unchanged": true,
+  "readme_sha256": {
+    "README.md": "b9a58bb93cce79f0b1a703addd0991d90ab6356c316f5cd931a51fb4bea40af1",
+    "README_zh.md": "908f16f0849aa0a2589703c6b09755651c8e8cfe50d3af210dc20e23024d52d0"
+  }
+}
