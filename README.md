@@ -53,12 +53,6 @@ python -m src.estimator.train --synthetic --length 8 --val_length 4 \
     --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
 
-Training clips the total gradient norm to 1.0 (`--max_grad_norm`) and reports the epoch/batch if inputs, predictions, loss, or gradients become non-finite. Invalid gradients stop training before an optimizer update.
-
-The `retained_replay_v2` recipe fixes JPEG synthesis in the 8-bit domain and uses independent random streams for degradation families. Synthesis consistency compares predicted and ground-truth **retained** degradations with the same random realization; discarded effects remain in the network input but cannot penalize a correct retained reconstruction. Confidence training and calibration both use predicted labels to compare a retained reconstruction against the full observation. Confidence measures this reconstruction reliability, rather than a probability that every parameter is correct.
-
-`metrics.jsonl` reports retained-only F1/MAE, per-class precision/recall, an all-positive classification baseline and a constant-0.5 parameter baseline. `calibration.json` records confidence BCE before/after fitting; calibration keeps T=1 if fitting does not improve this held-out objective. Retrain into a new directory; old checkpoints stay loadable, but their loss values are not comparable with this recipe. Shared degradation fixes also affect future backbone pretraining.
-
 ## Test-Time Adaptation
 
 Put the checkpoints under `checkpoints/` and run `main_tta.py`.

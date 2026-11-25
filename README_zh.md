@@ -53,12 +53,6 @@ python -m src.estimator.train --synthetic --length 8 --val_length 4 \
     --cal_length 4 --epochs 2 --batch_size 2 --calibrate --save_dir checkpoints/estimator_smoke
 ```
 
-训练默认将总梯度范数裁剪到 1.0（可用 `--max_grad_norm` 调整）。输入、预测、loss 或梯度出现 NaN/Inf 时会报出所在轮次和批次；异常梯度会在优化器更新前停止训练。
-
-`retained_replay_v2` 修正了 JPEG 的 8-bit 数值尺度，并为不同退化类型使用独立随机流。合成一致性比较预测参数与真实参数在**相同随机实现下的 retain 退化结果**；discard 效果仍保留在网络输入中，但不会惩罚正确的 retain 重建。置信度训练与校准统一使用预测标签，将 retain 重建与完整观测比较；置信度衡量这一重建的可靠程度，不代表所有参数正确的概率。
-
-`metrics.jsonl` 新增 retain 类别的 F1/MAE、各类 precision/recall，以及“全部预测存在”和“归一化参数固定为 0.5”两种基线。`calibration.json` 记录温度拟合前后的置信度 BCE；如果拟合没有改善该留出集目标，则保留 T=1。建议用新目录重新训练；旧权重仍可加载，但新旧训练的 loss 数值不能直接比较。共享退化算子的修正也会影响后续 backbone 预训练。
-
 ## 测试时自适应
 
 将权重放入 `checkpoints/` 后运行 `main_tta.py`。
